@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aeterna Finds - Verified Antiques</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f8f8;
+        }
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e0e0e0;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #a0a0a0;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #707070;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white p-4 shadow-lg">
+        <div class="container mx-auto flex flex-col sm:flex-row justify-between items-center">
+            <h1 class="text-3xl font-bold mb-2 sm:mb-0">Aeterna Finds</h1>
+            <nav>
+                <ul class="flex space-x-4">
+                    <li><a href="#" class="hover:text-blue-200 transition duration-300">Home</a></li>
+                    <li><a href="#" class="hover:text-blue-200 transition duration-300">About</a></li>
+                    <li><button id="openSellerFormBtn" class="hover:text-blue-200 transition duration-300 focus:outline-none">Become a Seller</button></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto p-6">
+        <section class="mb-8 bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-3xl font-semibold text-gray-800 mb-4">Discover Authenticated Treasures</h2>
+            <p class="text-gray-600 mb-6">Explore our curated collection of verified antique items. Each piece is rigorously checked to ensure its authenticity, providing you with confidence in every find.</p>
+
+            <!-- Search and Filter -->
+            <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-6">
+                <input type="text" id="searchInput" placeholder="Search by name or description..." class="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm">
+                <select id="categoryFilter" class="p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm sm:w-1/4">
+                    <option value="All">All Categories</option>
+                    <option value="Furniture">Furniture</option>
+                    <option value="Jewelry">Jewelry</option>
+                    <option value="Art">Art</option>
+                    <option value="Collectibles">Collectibles</option>
+                    <option value="Books">Books & Manuscripts</option>
+                </select>
+            </div>
+        </section>
+
+        <!-- Antique Listings Grid -->
+        <section id="antiqueListings" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Antique cards will be injected here by JavaScript -->
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white p-4 mt-8 shadow-inner">
+        <div class="container mx-auto text-center text-sm">
+            &copy; 2025 Aeterna Finds. All rights reserved.
+        </div>
+    </footer>
+
+    <!-- Antique Detail Modal -->
+    <div id="antiqueDetailModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto relative p-6">
+            <button id="closeDetailModalBtn" class="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-3xl font-bold leading-none">&times;</button>
+            <div class="flex flex-col md:flex-row gap-6">
+                <div class="md:w-1/2">
+                    <img id="modalImage" src="" alt="Antique Image" class="w-full h-auto rounded-lg object-cover shadow-md mb-4">
+                    <div id="modalBadges" class="flex flex-wrap gap-2">
+                        <!-- Badges like 'Verified' will go here -->
+                    </div>
+                </div>
+                <div class="md:w-1/2">
+                    <h3 id="modalName" class="text-3xl font-bold text-gray-900 mb-2"></h3>
+                    <p id="modalCategory" class="text-lg text-blue-700 font-medium mb-3"></p>
+                    <p class="text-gray-700 mb-4" id="modalDescription"></p>
+                    <div class="mb-4">
+                        <p class="font-semibold text-gray-800">Provenance:</p>
+                        <p class="text-gray-600" id="modalProvenance"></p>
+                    </div>
+                    <div class="mb-4">
+                        <p class="font-semibold text-gray-800">Seller:</p>
+                        <p class="text-gray-600" id="modalSeller"></p>
+                    </div>
+                    <button id="contactSellerBtn" class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg text-lg font-semibold hover:bg-blue-700 transition duration-300 shadow-md">Contact Seller</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Seller Confirmation Modal -->
+    <div id="contactConfirmationModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full relative p-6 text-center">
+            <button id="closeContactConfirmBtn" class="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-3xl font-bold leading-none">&times;</button>
+            <p class="text-xl font-semibold text-gray-800 mb-4">Contact Seller</p>
+            <p class="text-gray-600 mb-6">You are about to contact <span id="confirmSellerName" class="font-medium"></span> for <span id="confirmItemName" class="font-medium"></span>. A new communication channel will be initiated for you to connect directly.</p>
+            <button id="initiateContactBtn" class="bg-blue-600 text-white py-3 px-6 rounded-lg text-lg font-semibold hover:bg-blue-700 transition duration-300 shadow-md">Proceed to Contact</button>
+        </div>
+    </div>
+
+    <!-- Become a Seller Form Modal -->
+    <div id="sellerFormModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative p-6">
+            <button id="closeSellerFormBtn" class="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-3xl font-bold leading-none">&times;</button>
+            <h3 class="text-3xl font-bold text-gray-900 mb-4 text-center">Become an Aeterna Finds Seller</h3>
+            <p class="text-gray-700 mb-6 text-center">Join our curated community of trusted antique sellers. Please fill out the form below, and our team will review your application. We prioritize expertise and verifiable reputation.</p>
+
+            <form id="sellerApplicationForm" class="space-y-4">
+                <div>
+                    <label for="sellerName" class="block text-gray-700 font-medium mb-1">Your Name</label>
+                    <input type="text" id="sellerName" name="sellerName" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm" required>
+                </div>
+                <div>
+                    <label for="sellerEmail" class="block text-gray-700 font-medium mb-1">Email Address</label>
+                    <input type="email" id="sellerEmail" name="sellerEmail" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm" required>
+                </div>
+                <div>
+                    <label for="sellerExpertise" class="block text-gray-700 font-medium mb-1">Area of Expertise (e.g., European Porcelain, Art Deco Jewelry)</label>
+                    <input type="text" id="sellerExpertise" name="sellerExpertise" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm" required>
+                </div>
+                <div>
+                    <label for="sellerExperience" class="block text-gray-700 font-medium mb-1">Years of Experience in Antiques</label>
+                    <input type="number" id="sellerExperience" name="sellerExperience" min="1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm" required>
+                </div>
+                <div>
+                    <label for="sellerPortfolio" class="block text-gray-700 font-medium mb-1">Link to Online Portfolio or Professional References (Optional but Recommended)</label>
+                    <input type="url" id="sellerPortfolio" name="sellerPortfolio" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm">
+                </div>
+                <div>
+                    <label for="sellerMessage" class="block text-gray-700 font-medium mb-1">Tell us why you want to join Aeterna Finds and what makes your items unique.</label>
+                    <textarea id="sellerMessage" name="sellerMessage" rows="4" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 shadow-sm" required></textarea>
+                </div>
+                <button type="submit" class="w-full bg-green-600 text-white py-3 px-6 rounded-lg text-lg font-semibold hover:bg-green-700 transition duration-300 shadow-md">Submit Application</button>
+            </form>
+            <div id="sellerApplicationSuccess" class="hidden mt-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                <strong class="font-bold">Application Received!</strong>
+                <span class="block sm:inline">Thank you for your interest. We will review your application and get back to you soon.</span>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // Sample hardcoded antique data (our 'verified listings')
+        const antiques = [
+            {
+                id: 1,
+                name: "Victorian Era Mahogany Dresser",
+                category: "Furniture",
+                description: "A beautifully preserved dresser from the late 19th century, featuring intricate hand-carved details and original brass hardware. Perfect for adding a touch of classic elegance to any room.",
+                provenance: "Acquired from a private collection in London, UK, established 1950s.",
+                images: ["https://placehold.co/600x400/808080/FFFFFF?text=Victorian+Dresser"],
+                sellerInfo: { name: "Antiques & Co.", contact: "contact@antiquesandco.com" },
+                isVerified: true
+            },
+            {
+                id: 2,
+                name: "Art Deco Emerald Ring",
+                category: "Jewelry",
+                description: "An exquisite Art Deco ring featuring a central emerald cut emerald surrounded by dazzling baguette diamonds set in platinum. A true representation of 1920s glamour.",
+                provenance: "Originally from a New York estate, dated 1928.",
+                images: ["https://placehold.co/600x400/808080/FFFFFF?text=Emerald+Ring"],
+                sellerInfo: { name: "Gems of Yesteryear", contact: "info@gemsofyesteryear.com" },
+                isVerified: true
+            },
+            {
+                id: 3,
+                name: "18th Century Oil Landscape Painting",
+                category: "Art",
+                description: "A serene oil painting depicting a pastoral landscape, characteristic of the 18th-century Romantic movement. Framed in its original gilded frame.",
+                provenance: "Passed down through a French noble family, documented since 1780.",
+                images: ["https://placehold.co/600x400/808080/FFFFFF?text=Landscape+Painting"],
+                sellerInfo: { name: "Fine Art Classics", contact: "sales@fineartclassics.net" },
+                isVerified: true
+            },
+            {
+                id: 4,
+                name: "Vintage Stamp Collection (Early 20th Century)",
+                category: "Collectibles",
+                description: "A meticulously assembled collection of rare stamps from various countries, primarily focusing on early 20th-century issues. Includes several first-day covers.",
+                provenance: "Assembled by a renowned philatelist over 50 years.",
+                images: ["https://placehold.co/600x400/808080/FFFFFF?text=Stamp+Collection"],
+                sellerInfo: { name: "Collector's Den", contact: "support@collectorsden.org" },
+                isVerified: true
+            },
+            {
+                id: 5,
+                name: "First Edition 'Moby Dick'",
+                category: "Books",
+                description: "A true first edition of Herman Melville's 'Moby Dick', published in 1851. Bound in original brown cloth, with minor wear consistent with age. A literary treasure.",
+                provenance: "Purchased from a rare book auction in 1970, originally from a New England library.",
+                images: ["https://placehold.co/600x400/808080/FFFFFF?text=Moby+Dick"],
+                sellerInfo: { name: "Rare Tome Emporium", contact: "contact@raretome.com" },
+                isVerified: true
+            },
+             {
+                id: 6,
+                name: "Chinese Qing Dynasty Porcelain Vase",
+                category: "Collectibles",
+                description: "An exquisite porcelain vase from the Qing Dynasty, featuring traditional blue and white floral motifs. Hand-painted with meticulous detail, it showcases the era's artistry.",
+                provenance: "Part of a private Asian art collection for three generations, authenticated by reputable auction house.",
+                images: ["https://placehold.co/600x400/808080/FFFFFF?text=Qing+Vase"],
+                sellerInfo: { name: "Eastern Treasures", contact: "sales@easterntreasures.co" },
+                isVerified: true
+            },
+            {
+                id: 7,
+                name: "Mid-Century Modern Lounge Chair",
+                category: "Furniture",
+                description: "An iconic lounge chair from the 1960s, upholstered in its original leather with a solid walnut frame. Exemplifies the clean lines and minimalist aesthetic of mid-century design.",
+                provenance: "Acquired from the original owner in California, USA. Well-documented history.",
+                images: ["https://placehold.co/600x400/808080/FFFFFF?text=Mid-Century+Chair"],
+                sellerInfo: { name: "Retro Revival", contact: "info@retrorevival.net" },
+                isVerified: true
+            },
+            {
+                id: 8,
+                name: "Edwardian Pearl and Diamond Brooch",
+                category: "Jewelry",
+                description: "A delicate Edwardian-era brooch crafted in platinum and set with natural pearls and rose-cut diamonds. An elegant piece reflecting the refinement of the period.",
+                provenance: "Family heirloom from a notable European lineage.",
+                images: ["https://placehold.co/600x400/808080/FFFFFF?text=Edwardian+Brooch"],
+                sellerInfo: { name: "Vintage Sparkle", contact: "support@vintagesparkle.org" },
+                isVerified: true
+            }
+        ];
+
+        // Get DOM elements
+        const antiqueListingsDiv = document.getElementById('antiqueListings');
+        const searchInput = document.getElementById('searchInput');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const antiqueDetailModal = document.getElementById('antiqueDetailModal');
+        const closeDetailModalBtn = document.getElementById('closeDetailModalBtn');
+        const modalImage = document.getElementById('modalImage');
+        const modalBadges = document.getElementById('modalBadges');
+        const modalName = document.getElementById('modalName');
+        const modalCategory = document.getElementById('modalCategory');
+        const modalDescription = document.getElementById('modalDescription');
+        const modalProvenance = document.getElementById('modalProvenance');
+        const modalSeller = document.getElementById('modalSeller');
+        const contactSellerBtn = document.getElementById('contactSellerBtn');
+
+        const contactConfirmationModal = document.getElementById('contactConfirmationModal');
+        const closeContactConfirmBtn = document.getElementById('closeContactConfirmBtn');
+        const confirmSellerName = document.getElementById('confirmSellerName');
+        const confirmItemName = document.getElementById('confirmItemName');
+        const initiateContactBtn = document.getElementById('initiateContactBtn');
+
+        const openSellerFormBtn = document.getElementById('openSellerFormBtn');
+        const sellerFormModal = document.getElementById('sellerFormModal');
+        const closeSellerFormBtn = document.getElementById('closeSellerFormBtn');
+        const sellerApplicationForm = document.getElementById('sellerApplicationForm');
+        const sellerApplicationSuccess = document.getElementById('sellerApplicationSuccess');
+
+        let selectedAntique = null; // To store the antique being viewed in the modal
+
+        // Function to render antique cards
+        function renderAntiques(filteredAntiques) {
+            antiqueListingsDiv.innerHTML = ''; // Clear current listings
+            if (filteredAntiques.length === 0) {
+                antiqueListingsDiv.innerHTML = '<p class="text-center text-gray-600 col-span-full">No antiques found matching your criteria.</p>';
+                return;
+            }
+
+            filteredAntiques.forEach(antique => {
+                const antiqueCard = document.createElement('div');
+                antiqueCard.className = 'bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden cursor-pointer';
+                antiqueCard.innerHTML = `
+                    <img src="${antique.images[0]}" alt="${antique.name}" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h4 class="text-xl font-semibold text-gray-900 mb-2 truncate">${antique.name}</h4>
+                        <p class="text-blue-700 text-sm mb-3">${antique.category}</p>
+                        <div class="flex items-center text-green-600 text-sm font-medium">
+                            <svg class="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            Aeterna Finds Verified
+                        </div>
+                    </div>
+                `;
+                antiqueCard.addEventListener('click', () => openAntiqueDetailModal(antique));
+                antiqueListingsDiv.appendChild(antiqueCard);
+            });
+        }
+
+        // Function to open antique detail modal
+        function openAntiqueDetailModal(antique) {
+            selectedAntique = antique;
+            modalImage.src = antique.images[0];
+            modalImage.alt = antique.name;
+            modalName.textContent = antique.name;
+            modalCategory.textContent = antique.category;
+            modalDescription.textContent = antique.description;
+            modalProvenance.textContent = antique.provenance;
+            modalSeller.textContent = antique.sellerInfo.name;
+
+            // Clear existing badges and add new ones
+            modalBadges.innerHTML = '';
+            if (antique.isVerified) {
+                const verifiedBadge = document.createElement('span');
+                verifiedBadge.className = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 shadow-sm';
+                verifiedBadge.innerHTML = `
+                    <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    Verified
+                `;
+                modalBadges.appendChild(verifiedBadge);
+            }
+
+            antiqueDetailModal.classList.remove('hidden');
+        }
+
+        // Function to close antique detail modal
+        closeDetailModalBtn.addEventListener('click', () => {
+            antiqueDetailModal.classList.add('hidden');
+            selectedAntique = null;
+        });
+
+        // Event listener for Contact Seller button
+        contactSellerBtn.addEventListener('click', () => {
+            if (selectedAntique) {
+                confirmSellerName.textContent = selectedAntique.sellerInfo.name;
+                confirmItemName.textContent = selectedAntique.name;
+                contactConfirmationModal.classList.remove('hidden');
+                antiqueDetailModal.classList.add('hidden'); // Hide detail modal
+            }
+        });
+
+        // Event listener for closing contact confirmation modal
+        closeContactConfirmBtn.addEventListener('click', () => {
+            contactConfirmationModal.classList.add('hidden');
+        });
+
+        // Event listener for initiating contact (conceptual)
+        initiateContactBtn.addEventListener('click', () => {
+            // In a real application, this would initiate a chat, open an email client, etc.
+            // For this MVP, we'll just simulate success.
+            console.log(`Initiating contact with ${selectedAntique.sellerInfo.name} for ${selectedAntique.name}`);
+            // You might want to show a toast message here instead of an alert
+            alert(`Contact request sent for "${selectedAntique.name}"! The seller will reach out to you via ${selectedAntique.sellerInfo.contact}.`);
+            contactConfirmationModal.classList.add('hidden');
+        });
+
+
+        // Function to filter and search antiques
+        function filterAndSearchAntiques() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const selectedCategory = categoryFilter.value;
+
+            const filtered = antiques.filter(antique => {
+                const matchesSearch = antique.name.toLowerCase().includes(searchTerm) ||
+                                      antique.description.toLowerCase().includes(searchTerm);
+                const matchesCategory = selectedCategory === 'All' || antique.category === selectedCategory;
+                return matchesSearch && matchesCategory;
+            });
+            renderAntiques(filtered);
+        }
+
+        // Event listeners for search and filter
+        searchInput.addEventListener('keyup', filterAndSearchAntiques);
+        categoryFilter.addEventListener('change', filterAndSearchAntiques);
+
+        // Event listeners for "Become a Seller" form
+        openSellerFormBtn.addEventListener('click', () => {
+            sellerFormModal.classList.remove('hidden');
+            sellerApplicationSuccess.classList.add('hidden'); // Hide success message on open
+            sellerApplicationForm.reset(); // Clear form on open
+        });
+
+        closeSellerFormBtn.addEventListener('click', () => {
+            sellerFormModal.classList.add('hidden');
+        });
+
+        sellerApplicationForm.addEventListener('submit', (event) => {
+            event.preventDefault(); // Prevent default form submission
+            // In a real application, this would send data to a backend
+            // For MVP, just simulate success and hide the form, show success message
+            console.log("Seller application submitted (conceptually):", {
+                name: document.getElementById('sellerName').value,
+                email: document.getElementById('sellerEmail').value,
+                expertise: document.getElementById('sellerExpertise').value,
+                experience: document.getElementById('sellerExperience').value,
+                portfolio: document.getElementById('sellerPortfolio').value,
+                message: document.getElementById('sellerMessage').value
+            });
+            sellerApplicationForm.classList.add('hidden'); // Hide form
+            sellerApplicationSuccess.classList.remove('hidden'); // Show success message
+            // Optionally, close modal after a delay
+            setTimeout(() => {
+                sellerFormModal.classList.add('hidden');
+                sellerApplicationForm.classList.remove('hidden'); // Prepare form for next open
+            }, 3000);
+        });
+
+
+        // Initial render of all antiques when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            renderAntiques(antiques);
+        });
+    </script>
+</body>
+</html>
